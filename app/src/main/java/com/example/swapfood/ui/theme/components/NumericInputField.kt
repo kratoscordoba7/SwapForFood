@@ -22,13 +22,16 @@ import androidx.compose.ui.text.input.KeyboardType
 fun NumericInputField(codeLength: Int = 6, onComplete: (String) -> Unit) {
     var code by remember { mutableStateOf("") }
 
-    Column {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally, // Centrar horizontalmente el contenido
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 15.dp) // Mueve el Row hacia la derecha
+                .wrapContentWidth(Alignment.CenterHorizontally) // Asegura que el contenido esté centrado en el ancho total
         ) {
             for (i in 0 until codeLength) {
                 Box(

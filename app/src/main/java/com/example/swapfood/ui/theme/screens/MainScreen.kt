@@ -9,16 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.swapfood.R
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.components.NumericInputField
-import com.example.swapfood.utils.InformativeDialog
 import com.example.swapfood.utils.byBluetooth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,15 +30,19 @@ fun MainScreen(
         topBar = { AppTopBar() },
         containerColor = Color(0xBBFDA403)
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center // Centra el contenido tanto vertical como horizontalmente
+        ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.Center // Centra los elementos verticalmente dentro de la Column
             ) {
-                Spacer(modifier = Modifier.height(130.dp))
                 Text(
                     text = "Introduce un código de sala",
                     color = Color.White,
@@ -56,7 +57,7 @@ fun MainScreen(
                 Spacer(modifier = Modifier.height(48.dp))
 
                 // Botón Unirse
-                if (code.isNotEmpty()){
+                if (code.isNotEmpty()) {
                     Button(
                         onClick = {
                             onJoinRoomClick(code)
