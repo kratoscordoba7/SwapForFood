@@ -4,6 +4,7 @@ package com.example.swapfood.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -83,9 +84,10 @@ fun MainScreen(
                         .fillMaxWidth()
                         .height(48.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF898121),
-                        contentColor = Color.White
-                    )
+                        containerColor = Color(0xFFFB4F3A), // Rojo del botón
+                        contentColor = Color.White // Color del texto blanco
+                    ),
+                    shape = RoundedCornerShape(8.dp) // Bordes redondeados como el ejemplo
                 ) {
                     Text("Crear sala")
                 }

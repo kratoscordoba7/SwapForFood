@@ -19,7 +19,7 @@ fun AppTopBar() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(65.dp) // Ajuste de altura con la sombra
+            .height(65.dp) // Mantiene el tamaño fijo del header
             .shadow(
                 elevation = 30.dp,
                 shape = RectangleShape,
@@ -32,13 +32,18 @@ fun AppTopBar() {
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logo),
-                        contentDescription = "App Logo",
+                    Box(
                         modifier = Modifier
-                            .height(60.dp) // Tamaño adecuado del logo
-                            .aspectRatio(1f) // Mantiene la proporción del logo
-                    )
+                            .size(100.dp) // Tamaño fijo para la imagen, independiente del contenedor
+                            .align(Alignment.Center)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo),
+                            contentDescription = "App Logo",
+                            modifier = Modifier
+                                .fillMaxSize() // La imagen ocupa todo el espacio del Box
+                        )
+                    }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
