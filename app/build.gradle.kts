@@ -92,4 +92,7 @@ dependencies {
     // Optional - Integration with RxJava
     implementation("androidx.compose.runtime:runtime-rxjava2")
 
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
+
 }

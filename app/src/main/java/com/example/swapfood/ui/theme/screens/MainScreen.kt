@@ -19,6 +19,9 @@ import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.components.NumericInputField
 import com.example.swapfood.utils.byBluetooth
 
+// Agrega este import
+import androidx.constraintlayout.compose.ConstraintLayout
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -35,27 +38,51 @@ fun MainScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize(),
-            contentAlignment = Alignment.Center // Centra el contenido tanto vertical como horizontalmente
         ) {
-            Column(
+            ConstraintLayout(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center // Centra los elementos verticalmente dentro de la Column
+                    .fillMaxSize()
+                    .padding(16.dp)
             ) {
+                // Crea referencias para los composables a posicionar
+                val (
+                    titleRef,
+                    numericInputFieldRef,
+                    joinButtonRef,
+                    createButtonRef
+                // bluetoothImageRef
+                ) = createRefs()
+
+                // Crea guías en porcentajes específicos
+                val guideline10 = createGuidelineFromTop(0.10f)
+                val guideline25 = createGuidelineFromTop(0.25f)
+                val guideline40 = createGuidelineFromTop(0.40f)
+                val guideline55 = createGuidelineFromTop(0.55f)
+                val guideline70 = createGuidelineFromTop(0.70f)
+                val guideline90 = createGuidelineFromTop(0.90f)
+
+
+                // Texto del título
                 Text(
                     text = "Introduce un código de sala",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
+                    modifier = Modifier.constrainAs(titleRef) {
+                        top.linkTo(guideline10)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
                 )
-                Spacer(modifier = Modifier.height(20.dp))
-                NumericInputField(codeLength = 5) { inputCode ->
-                    code = inputCode
-                }
 
-                Spacer(modifier = Modifier.height(48.dp))
+                // Campo de entrada numérica
+                NumericInputField(
+                    codeLength = 5,
+                    onComplete = { inputCode ->
+                        code = inputCode
+                    },
+
+                )
 
                 // Botón Unirse
                 if (code.isNotEmpty()) {
@@ -65,7 +92,12 @@ fun MainScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(54.dp),
+                            .height(54.dp)
+                            .constrainAs(joinButtonRef) {
+                                top.linkTo(guideline40)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF898121),
                             contentColor = Color.White
@@ -75,14 +107,17 @@ fun MainScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(30.dp))
-
                 // Botón Crear sala
                 Button(
                     onClick = { onCreateRoomClick() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
+                        .height(48.dp)
+                        .constrainAs(createButtonRef) {
+                            top.linkTo(guideline90)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFFB4F3A), // Rojo del botón
                         contentColor = Color.White // Color del texto blanco
@@ -92,20 +127,22 @@ fun MainScreen(
                     Text("Crear sala")
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
-
-                /* Botón de Bluetooth
-                Box {
-                    Image(
-                        painter = painterResource(id = R.drawable.bluetooth),
-                        contentDescription = "Bluetooth",
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clickable(onClick = { byBluetooth() })
-                            .padding(8.dp),
-                    )
-                }
-                 */
+                /*
+                // Botón de Bluetooth
+                Image(
+                    painter = painterResource(id = R.drawable.bluetooth),
+                    contentDescription = "Bluetooth",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clickable(onClick = { byBluetooth() })
+                        .padding(8.dp)
+                        .constrainAs(bluetoothImageRef) {
+                            top.linkTo(guideline70)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+                */
             }
         }
     }
