@@ -51,7 +51,7 @@ fun MainScreen(
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                NumericInputField(codeLength = 6) { inputCode ->
+                NumericInputField(codeLength = 5) { inputCode ->
                     code = inputCode
                 }
 
