@@ -55,6 +55,8 @@ dependencies {
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
+    testImplementation("junit:junit:4.13.2")
+
     // Choose one of the following:
     // Material Design 3
     implementation("androidx.compose.material3:material3")

@@ -20,12 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun NumericInputField(codeLength: Int = 5, onComplete: (String) -> Unit) {
+fun NumericInputField(codeLength: Int = 5, onComplete: (String) -> Unit,
+                      modifier: Modifier = Modifier // Nuevo parámetro
+) {
     var code by remember { mutableStateOf("") }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
            // .padding(5.dp) // Opcional: Añade padding al contenedor
     ) {
