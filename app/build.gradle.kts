@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.swapfood"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -44,7 +44,10 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += setOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "META-INF/INDEX.LIST"
+            )
         }
     }
 }
@@ -91,5 +94,11 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata")
     // Optional - Integration with RxJava
     implementation("androidx.compose.runtime:runtime-rxjava2")
-
+    implementation("io.ktor:ktor-client-websockets:2.3.4") // Cliente WebSocket
+    implementation("io.ktor:ktor-client-core:2.3.4")      // Core del cliente
+    implementation("io.ktor:ktor-client-cio:2.3.4")       // Motor basado en CIO
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.4") // Serialización JSON
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0") // kotlinx.serialization
+    // implementation("org.slf4j:slf4j-api:2.0.7") // SLF4J API
+    // implementation("ch.qos.logback:logback-classic:1.4.11")  // Logback Classic (SLF4J Binding)
 }

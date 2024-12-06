@@ -16,15 +16,19 @@ import androidx.compose.ui.unit.sp
 import com.example.swapfood.R
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.components.NumericInputField
+import com.example.swapfood.utils.InputNameDialog
 import com.example.swapfood.utils.byBluetooth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    onCreateRoomClick: () -> Unit,
-    onJoinRoomClick: (String) -> Unit
+    onCreateRoomClick: (String) -> Unit,
+    onJoinRoomClick: (String, String) -> Unit
 ) {
     var code by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    var showDialog2 by remember { mutableStateOf(false) }
+
 
     Scaffold(
         topBar = { AppTopBar() },
@@ -59,9 +63,7 @@ fun MainScreen(
                 // Botón Unirse
                 if (code.isNotEmpty()) {
                     Button(
-                        onClick = {
-                            onJoinRoomClick(code)
-                        },
+                        onClick = { showDialog2 = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(54.dp),
@@ -78,7 +80,7 @@ fun MainScreen(
 
                 // Botón Crear sala
                 Button(
-                    onClick = { onCreateRoomClick() },
+                    onClick = { showDialog = true },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
@@ -91,7 +93,25 @@ fun MainScreen(
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))
+                if (showDialog) {
+                    InputNameDialog(
+                        onDismissRequest = { showDialog = false }, // Cerrar diálogo al cancelar
+                        onConfirm = { name ->
+                            showDialog = false // Cerrar diálogo al confirmar
+                            onCreateRoomClick(name) // Llamar a la función con el nombre ingresado
+                        }
+                    )
+                }
 
+                if (showDialog2) {
+                    InputNameDialog(
+                        onDismissRequest = { showDialog2 = false }, // Cerrar diálogo al cancelar
+                        onConfirm = { name ->
+                            showDialog2 = false // Cerrar diálogo al confirmar
+                            onJoinRoomClick(name, code) // Llamar a la función con el nombre ingresado
+                        }
+                    )
+                }
                 /* Botón de Bluetooth
                 Box {
                     Image(

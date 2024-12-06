@@ -1,9 +1,12 @@
 package com.example.swapfood.ui.screens
 
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.swapfood.server.LobbyViewModel
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.theme.components.ParticipantsList
 import com.example.swapfood.utils.ConfirmationDialog
@@ -25,13 +29,23 @@ fun CreateRoomScreen(
     roomCode: String,
     participants: List<String>,
     onBackClick: () -> Unit,
-    onStartClick: () -> Unit
+    onStartClick: () -> Unit,
+    lobbyViewModel: LobbyViewModel
 ) {
     // Crear una lista mutable para poder modificarla (remover participantes)
     val participantsState = remember { mutableStateListOf(*participants.toTypedArray()) }
     val text: String = if (showMore) "Lista de participantes" else "Esperando al lider"
-    var delete by remember {mutableStateOf(false)}
+    var delete by remember { mutableStateOf(false) }
     var currentParticipant by remember { mutableStateOf("") }
+
+    // Observa el flujo de usuarios en la lobby
+    val users by lobbyViewModel.usersInLobby.collectAsState()
+
+    // Actualiza la lista de participantes cuando cambie el flujo
+    LaunchedEffect(users) {
+        participantsState.clear()
+        participantsState.addAll(users)
+    }
 
     Scaffold(
         topBar = { AppTopBar() }
@@ -83,15 +97,15 @@ fun CreateRoomScreen(
             ParticipantsList(
                 participants = participantsState,
                 showMore = showMore,
-                onRemoveParticipantClick = {
-                    participant -> currentParticipant = participant
+                onRemoveParticipantClick = { participant ->
+                    currentParticipant = participant
                     delete = true
                 }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Row for "Atrás" and "Comenzar" buttons
+            // Row for "Atrás" y "Comenzar" botones
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -117,10 +131,9 @@ fun CreateRoomScreen(
                 // Botón "Comenzar"
                     Button(
                         onClick = {
-                        /* Se ha de realizar una request al servidor para que se
-                        * notifique a todos los usuarios de la sala de la siguiente vista */
+                            /* Se ha de realizar una request al servidor para que se
+                             * notifique a todos los usuarios de la sala de la siguiente vista */
                             onStartClick()
-
                         },
                         modifier = Modifier
                             .weight(1f)
@@ -135,8 +148,7 @@ fun CreateRoomScreen(
             }
             if (delete) {
                 ConfirmationDialog(
-                    onDismissRequest =
-                    {
+                    onDismissRequest = {
                         delete = false
                         currentParticipant = ""
                     },
@@ -147,12 +159,17 @@ fun CreateRoomScreen(
                     onConfirm = {
                         participantsState.remove(currentParticipant)
                         // Aquí también deberías notificar al servidor sobre la expulsión si es necesario
+                        delete = false
+                        currentParticipant = ""
                     },
                     onDismiss = {
                         // Acción al descartar, si es necesario
+                        delete = false
+                        currentParticipant = ""
                     },
                 )
             }
         }
     }
 }
+

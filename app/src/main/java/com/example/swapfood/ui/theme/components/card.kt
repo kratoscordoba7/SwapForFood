@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.swapfood.ui.theme.dataStructures.Restaurant
+import com.example.swapfood.dataStructures.Restaurant
 
 @Composable
 fun RestaurantCard(

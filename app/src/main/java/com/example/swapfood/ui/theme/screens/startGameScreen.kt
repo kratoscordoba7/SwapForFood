@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.example.swapfood.R
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.theme.components.RestaurantCard
-import com.example.swapfood.ui.theme.dataStructures.Restaurant
+import com.example.swapfood.dataStructures.Restaurant
 
 @Composable
 fun StartGameScreen() {
