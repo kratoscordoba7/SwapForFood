@@ -54,9 +54,13 @@ fun MainScreen(
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                NumericInputField(codeLength = 6) { inputCode ->
-                    code = inputCode
-                }
+                // Campo de entrada numérica
+                NumericInputField(
+                    codeLength = 5,
+                    onComplete = { inputCode ->
+                        code = inputCode
+                    },
+                )
 
                 Spacer(modifier = Modifier.height(48.dp))
 
