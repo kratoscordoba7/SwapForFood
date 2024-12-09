@@ -242,6 +242,10 @@ class LobbyViewModel : ViewModel() {
         }
     }
 
+    fun resetRoomStatus() {
+        _roomStatus.value = "ACTIVE"
+    }
+
     override fun onCleared() {
         super.onCleared()
         viewModelScope.launch(Dispatchers.IO) {

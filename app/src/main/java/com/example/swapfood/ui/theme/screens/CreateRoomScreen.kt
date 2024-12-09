@@ -23,6 +23,7 @@ import com.example.swapfood.server.LobbyViewModel
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.theme.components.ParticipantsList
 import com.example.swapfood.utils.ConfirmationDialog
+import com.example.swapfood.utils.InformativeDialog
 import kotlinx.coroutines.launch
 
 @Composable
@@ -45,6 +46,7 @@ fun CreateRoomScreen(
 
     // Observa el flujo de usuarios en la lobby
     val users by lobbyViewModel.usersInLobby.collectAsState()
+    var showInformativeDialog by remember { mutableStateOf(false) }
 
     // Actualiza la lista de participantes cuando cambie el flujo
     LaunchedEffect(users) {
@@ -53,9 +55,25 @@ fun CreateRoomScreen(
         println("Lista de participantes actualizada: $participantsState")
     }
 
-    // Si la sala está cerrada, ejecuta la acción correspondiente
+    // Lógica para manejar el estado "CLOSED"
     if (roomStatus == "CLOSED") {
-        onBackClick()
+        LaunchedEffect(Unit) {
+            lobbyViewModel.resetRoomStatus() // Resetea el estado
+            showInformativeDialog = true // Activa el diálogo
+        }
+    }
+
+    // Mostrar el diálogo si es necesario
+    if (showInformativeDialog) {
+        InformativeDialog(
+            onDismissRequest = {
+                showInformativeDialog = false
+                onBackClick() // Navega a la página principal
+            },
+            dialogTitle = "Sala Cerrada",
+            dialogText = "Usted ha sido expulsado o el lider ha cerrado la sala, volviendo al menú principal.",
+            buttonText = "Aceptar"
+        )
     }
 
     Scaffold(
