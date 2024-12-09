@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.example.swapfood.server.LobbyViewModel
 import com.example.swapfood.ui.screens.CreateRoomScreen
@@ -40,7 +42,8 @@ class MainActivity : ComponentActivity() {
                                 mutableListOf(""),
                                 onBackClick = { showMainScreen() },
                                 onStartClick = { showGameScreen() },
-                                lobbyViewModel
+                                lobbyViewModel,
+                                this@MainActivity
                             )
                         }
                     }
@@ -50,7 +53,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         } else {
-            println("Me estoy uniendo jiji")
             lifecycleScope.launch{
                 try {
                     val lista = lobbyViewModel.joinLobby(this@MainActivity, username, code)
@@ -63,7 +65,8 @@ class MainActivity : ComponentActivity() {
                                 lista,
                                 onBackClick = { showMainScreen() },
                                 onStartClick = { showGameScreen() },
-                                lobbyViewModel
+                                lobbyViewModel,
+                                this@MainActivity
                             )
                         }
                     }

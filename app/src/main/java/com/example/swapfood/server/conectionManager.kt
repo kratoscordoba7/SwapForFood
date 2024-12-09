@@ -34,6 +34,15 @@ class LobbyViewModel : ViewModel() {
     private val _usersInLobby = MutableStateFlow<List<String>>(emptyList())
     val usersInLobby: StateFlow<List<String>> = _usersInLobby
 
+    // Información del usuario eliminado
+    private val _recentUserEliminated = MutableStateFlow<String?>(null)
+    val recentUserElimnated: StateFlow<String?> = _recentUserEliminated
+
+    // Estado de la sala
+    private val _roomStatus = MutableStateFlow("ACTIVE") // Valores: "ACTIVE", "CLOSED"
+    val roomStatus: StateFlow<String> = _roomStatus
+
+
 
     init {
         // Ejecutar la conexión de forma asíncrona sin bloquear el hilo principal
@@ -110,6 +119,22 @@ class LobbyViewModel : ViewModel() {
                     Log.d("LobbyViewModel", "Usuario salió: $userLeft")
                 }
 
+                // El lider dejó la sala
+                messageContent.contains("ROOM_CLOSED") -> {
+                    Log.d("LobbyViewModel", "La sala ha sido cerrada.")
+                    viewModelScope.launch {
+                        _roomStatus.value = "CLOSED"
+                    }
+                }
+
+                // El lider dejó la sala
+                messageContent.contains("REMOVED") -> {
+                    Log.d("LobbyViewModel", "La sala ha sido cerrada.")
+                    viewModelScope.launch {
+                        _roomStatus.value = "CLOSED"
+                    }
+                }
+
                 // Mensaje de error del servidor
                 messageContent.startsWith("Error:") -> {
                     _connectionState.value = "Server Error: $messageContent"
@@ -154,6 +179,32 @@ class LobbyViewModel : ViewModel() {
         }
     }
 
+    suspend fun deleteUser(username: String, context: Context): Int{
+        try {
+            // Asegurarse de que la conexión está activa
+            if (webSocketClient.session == null || !webSocketClient.session!!.isActive) {
+                webSocketClient.connect()
+                _connectionState.value = "Connected"
+            }
+
+            // Obtención de la ip
+            val ip = getDeviceIpAddress(context)
+            if (ip.isNullOrEmpty()) {
+                Log.e("LobbyViewModel", "No se pudo obtener la IP del dispositivo")
+                webSocketClient.close()
+                throw IllegalStateException("No se pudo obtener la IP del dispositivo")
+            }
+
+            val message = Message(ip, "21$username", System.currentTimeMillis())
+            webSocketClient.sendMessage(message)
+
+            return 1
+        } catch (e: Exception){
+            Log.e("LobbyViewModel", "Error al eliminar usuario: ${e.message}")
+            throw e
+        }
+    }
+
     suspend fun joinLobby(context: Context, username: String = "Kratos", code: String): List<String> {
         try {
             // Asegurarse de que la conexión está activa
@@ -178,6 +229,15 @@ class LobbyViewModel : ViewModel() {
             return _usersInLobby.filter { it.isNotEmpty() }.first()
         } catch (e: Exception) {
             Log.e("LobbyViewModel", "Error al unirse a la sala: ${e.message}")
+            throw e
+        }
+    }
+
+    suspend fun endConnection(){
+        try {
+            webSocketClient.close()
+        } catch (e: Exception){
+            Log.e("LobbyViewModel", "Error al terminar la conexión: ${e.message}")
             throw e
         }
     }

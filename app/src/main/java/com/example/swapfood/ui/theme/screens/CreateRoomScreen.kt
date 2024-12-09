@@ -1,6 +1,6 @@
 package com.example.swapfood.ui.screens
 
-import androidx.activity.viewModels
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import com.example.swapfood.server.LobbyViewModel
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.theme.components.ParticipantsList
 import com.example.swapfood.utils.ConfirmationDialog
+import kotlinx.coroutines.launch
 
 @Composable
 fun CreateRoomScreen(
@@ -30,13 +32,16 @@ fun CreateRoomScreen(
     participants: List<String>,
     onBackClick: () -> Unit,
     onStartClick: () -> Unit,
-    lobbyViewModel: LobbyViewModel
+    lobbyViewModel: LobbyViewModel,
+    context: Context
 ) {
     // Crear una lista mutable para poder modificarla (remover participantes)
     val participantsState = remember { mutableStateListOf(*participants.toTypedArray()) }
     val text: String = if (showMore) "Lista de participantes" else "Esperando al lider"
     var delete by remember { mutableStateOf(false) }
     var currentParticipant by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+    val roomStatus by lobbyViewModel.roomStatus.collectAsState()
 
     // Observa el flujo de usuarios en la lobby
     val users by lobbyViewModel.usersInLobby.collectAsState()
@@ -45,6 +50,12 @@ fun CreateRoomScreen(
     LaunchedEffect(users) {
         participantsState.clear()
         participantsState.addAll(users)
+        println("Lista de participantes actualizada: $participantsState")
+    }
+
+    // Si la sala está cerrada, ejecuta la acción correspondiente
+    if (roomStatus == "CLOSED") {
+        onBackClick()
     }
 
     Scaffold(
@@ -97,7 +108,9 @@ fun CreateRoomScreen(
             ParticipantsList(
                 participants = participantsState,
                 showMore = showMore,
-                onRemoveParticipantClick = { participant ->
+                onRemoveParticipantClick = {
+                    participant ->
+                    println("Participante seleccionado: $participant")
                     currentParticipant = participant
                     delete = true
                 }
@@ -113,7 +126,12 @@ fun CreateRoomScreen(
             ) {
                 // Botón "Atrás"
                 Button(
-                    onClick = { onBackClick() },
+                    onClick = {
+                        coroutineScope.launch {
+                            lobbyViewModel.endConnection()
+                        }
+                        onBackClick()
+                              },
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),
@@ -146,29 +164,28 @@ fun CreateRoomScreen(
                         Text(text = "Comenzar")
                     }
             }
-            if (delete) {
+            if (delete && currentParticipant.isNotEmpty()) {
                 ConfirmationDialog(
-                    onDismissRequest = {
-                        delete = false
-                        currentParticipant = ""
-                    },
+                    onDismissRequest = { delete = false },
                     title = "Confirmar Expulsión",
                     text = "¿Estás seguro de que deseas expulsar a $currentParticipant?",
                     confirmButtonText = "Sí",
                     dismissButtonText = "No",
                     onConfirm = {
-                        participantsState.remove(currentParticipant)
-                        // Aquí también deberías notificar al servidor sobre la expulsión si es necesario
-                        delete = false
-                        currentParticipant = ""
+                        coroutineScope.launch {
+                            println("Eliminando a: $currentParticipant") // Depuración
+                            lobbyViewModel.deleteUser(currentParticipant, context)
+                            delete = false
+                            currentParticipant = ""
+                        }
                     },
                     onDismiss = {
-                        // Acción al descartar, si es necesario
                         delete = false
                         currentParticipant = ""
-                    },
+                    }
                 )
             }
+
         }
     }
 }
