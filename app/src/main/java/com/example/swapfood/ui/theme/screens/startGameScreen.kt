@@ -1,5 +1,7 @@
 package com.example.swapfood.ui.theme.screens
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
@@ -11,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import com.example.swapfood.R
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.theme.components.RestaurantCard
@@ -26,7 +29,8 @@ fun StartGameScreen() {
     var currentRestaurantIndex by remember { mutableStateOf(0) }
     var score by remember { mutableStateOf(0) }
     val swipedRestaurants = remember { mutableSetOf<Int>() }
-    var dragOffset by remember { mutableStateOf(0f) }
+    val dragOffset = remember { Animatable(0f) }
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = { AppTopBar() }
@@ -41,11 +45,10 @@ fun StartGameScreen() {
             if (currentRestaurantIndex < restaurants.size) {
                 val currentRestaurant = restaurants[currentRestaurantIndex]
 
-                // Determinamos el color de fondo basado en el offset
                 val backgroundColor = when {
-                    dragOffset > 250 -> Color(0xBB00FF9C)  // Deslizado a la derecha
-                    dragOffset < -250 -> Color(0xBBAF1740)  // Deslizado a la izquierda
-                    else -> Color.Transparent        // Fondo transparente cuando no se ha superado el umbral
+                    dragOffset.value > 250 -> Color(0xDDA7D477)  // Deslizado a la derecha
+                    dragOffset.value < -250 -> Color(0xBBAF1740)  // Deslizado a la izquierda
+                    else -> Color.Transparent
                 }
 
                 RestaurantCard(
@@ -53,42 +56,60 @@ fun StartGameScreen() {
                     modifier = Modifier
                         .size(width = 350.dp, height = 600.dp)
                         .graphicsLayer(
-                            translationX = dragOffset,
-                            rotationZ = dragOffset * 0.05f  // Ajusta este valor para mayor o menor curvatura
+                            translationX = dragOffset.value,
+                            rotationZ = dragOffset.value * 0.05f
                         )
-                        .background(backgroundColor) // Aplicamos el color de fondo dinámico
+                        .background(backgroundColor)
                         .pointerInput(Unit) {
                             detectDragGestures(
                                 onDrag = { change, dragAmount ->
-                                    dragOffset += dragAmount.x
+                                    coroutineScope.launch {
+                                        dragOffset.snapTo(dragOffset.value + dragAmount.x)
+                                    }
                                     change.consume()
                                 },
                                 onDragEnd = {
-                                    if (!swipedRestaurants.contains(currentRestaurantIndex)) {
-                                        when {
-                                            dragOffset > 250 -> {
-                                                // Deslizar a la derecha (like)
-                                                score += 1
-                                                swipedRestaurants.add(currentRestaurantIndex)
-                                                currentRestaurantIndex++
+                                    coroutineScope.launch {
+                                        if (!swipedRestaurants.contains(currentRestaurantIndex)) {
+                                            when {
+                                                dragOffset.value > 300 -> {
+                                                    // Continuar animación hacia la derecha
+                                                    dragOffset.animateTo(
+                                                        targetValue = 1000f, // Fuera de la pantalla
+                                                        animationSpec = tween(durationMillis = 300)
+                                                    )
+                                                    score += 1
+                                                    swipedRestaurants.add(currentRestaurantIndex)
+                                                    currentRestaurantIndex++
+                                                    dragOffset.snapTo(0f) // Reseteamos el offset para la siguiente carta
+                                                }
+                                                dragOffset.value < -300 -> {
+                                                    // Continuar animación hacia la izquierda
+                                                    dragOffset.animateTo(
+                                                        targetValue = -1000f, // Fuera de la pantalla
+                                                        animationSpec = tween(durationMillis = 300)
+                                                    )
+                                                    swipedRestaurants.add(currentRestaurantIndex)
+                                                    currentRestaurantIndex++
+                                                    dragOffset.snapTo(0f) // Reseteamos el offset para la siguiente carta
+                                                }
+                                                else -> {
+                                                    // Volver al centro si no se supera el umbral
+                                                    dragOffset.animateTo(
+                                                        targetValue = 0f,
+                                                        animationSpec = tween(durationMillis = 300)
+                                                    )
+                                                }
                                             }
-                                            dragOffset < -250 -> {
-                                                // Deslizar a la izquierda (dislike)
-                                                swipedRestaurants.add(currentRestaurantIndex)
-                                                currentRestaurantIndex++
-                                            }
-                                            else -> {
-                                                // Volver a la posición original si no se supera el umbral
-                                            }
+                                        } else {
+                                            dragOffset.snapTo(0f)
                                         }
                                     }
-                                    dragOffset = 0f
                                 }
                             )
                         }
                 )
             } else {
-                // Mostrar puntuación al final
                 Text(
                     text = "Juego terminado! Puntuación: $score",
                     color = Color.White,
@@ -98,4 +119,3 @@ fun StartGameScreen() {
         }
     }
 }
-
