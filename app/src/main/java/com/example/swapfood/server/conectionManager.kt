@@ -48,8 +48,10 @@ class LobbyViewModel : ViewModel() {
         // Ejecutar la conexión de forma asíncrona sin bloquear el hilo principal
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                webSocketClient.connect()
-                _connectionState.value = "Connected"
+                if (webSocketClient.session == null || !webSocketClient.session!!.isActive) {
+                    webSocketClient.connect()
+                    _connectionState.value = "Connected"
+                }
 
                 // Escuchar mensajes del servidor
                 webSocketClient.incomingMessages.collect { message ->
@@ -154,11 +156,8 @@ class LobbyViewModel : ViewModel() {
     // Función para crear una lobby y esperar el código de la sala
     suspend fun createLobby(context: Context, username: String = "Kratos"): String {
         try {
-            // Asegurarse de que la conexión está activa
-            if (webSocketClient.session == null || !webSocketClient.session!!.isActive) {
-                webSocketClient.connect()
-                _connectionState.value = "Connected"
-            }
+            _connectionState.filter { it == "Connected" }.first()
+
             // Obtención de la ip
             val ip = getDeviceIpAddress(context)
             if (ip.isNullOrEmpty()) {
@@ -182,10 +181,7 @@ class LobbyViewModel : ViewModel() {
     suspend fun deleteUser(username: String, context: Context): Int{
         try {
             // Asegurarse de que la conexión está activa
-            if (webSocketClient.session == null || !webSocketClient.session!!.isActive) {
-                webSocketClient.connect()
-                _connectionState.value = "Connected"
-            }
+            _connectionState.filter { it == "Connected" }.first()
 
             // Obtención de la ip
             val ip = getDeviceIpAddress(context)
@@ -208,10 +204,7 @@ class LobbyViewModel : ViewModel() {
     suspend fun joinLobby(context: Context, username: String = "Kratos", code: String): List<String> {
         try {
             // Asegurarse de que la conexión está activa
-            if (webSocketClient.session == null || !webSocketClient.session!!.isActive) {
-                webSocketClient.connect()
-                _connectionState.value = "Connected"
-            }
+            _connectionState.filter { it == "Connected" }.first()
 
             // Obtención de la IP
             val ip = getDeviceIpAddress(context)
