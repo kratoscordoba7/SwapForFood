@@ -58,7 +58,8 @@ fun CreateRoomScreen(
     // Lógica para manejar el estado "CLOSED"
     if (roomStatus == "CLOSED") {
         LaunchedEffect(Unit) {
-            lobbyViewModel.resetRoomStatus() // Resetea el estado
+            participantsState.clear()
+            lobbyViewModel.endConnection() // Resetea el estado
             showInformativeDialog = true // Activa el diálogo
         }
     }
