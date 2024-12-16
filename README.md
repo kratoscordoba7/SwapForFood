@@ -1,7 +1,6 @@
 # SwapForFood
 <h1 align="center">🌟 Aplicación final de curso </h1>
 
-<img align="left" width="160" height="160" src="img/octo_cat.png"></a>
 Se ha realizado una aplicación que se basa en la decisión, por un grupo de amigos, de un restaurante para ir a comer, cercano a ellos. 
 
 *Trabajo realizado por*:
