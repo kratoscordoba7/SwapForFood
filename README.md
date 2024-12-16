@@ -29,9 +29,6 @@ Sigue estos pasos para configurar y ejecutar la aplicación en tu entorno local:
 4. Ejecuta el proyecto presionando el botón **Run**.
 ---
 
-### Introducción
- Se abarcarán las siguientes partes:
-
 ### Objetivos 📖
 La apliación está diseñada bajo el siguiente concepto:
 Imagínese que ha quedado con un grupo de amigos para ver un película o cualquier evento social. Durante el desarrollo de dicho evento en el espectro común surge la idea de comer algo pero no se consigue consensuar algo fácilmente, en este contexto entra nuestra apliación, SwapForFood. Mediante la aplicación se podrá elegir mayoritariamente qué restaurante es el más aceptado en la zona y al cuál se irá. La aplicación opta por un diseño ágil, rápido y divertido para evitar la larga discusión que puede tomar llegar a un punto común entre un grupo de personas.
