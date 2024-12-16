@@ -13,22 +13,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.swapfood.R
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.components.NumericInputField
 import com.example.swapfood.utils.InputNameDialog
 import com.example.swapfood.utils.byBluetooth
+import com.example.swapfood.server.LobbyViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    lobbyViewModel: LobbyViewModel = viewModel(), // Obtiene el LobbyViewModel
     onCreateRoomClick: (String) -> Unit,
     onJoinRoomClick: (String, String) -> Unit
 ) {
     var code by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     var showDialog2 by remember { mutableStateOf(false) }
-
 
     Scaffold(
         topBar = { AppTopBar() },
@@ -112,10 +114,12 @@ fun MainScreen(
                         onDismissRequest = { showDialog2 = false }, // Cerrar diálogo al cancelar
                         onConfirm = { name ->
                             showDialog2 = false // Cerrar diálogo al confirmar
+                            lobbyViewModel.setCurrentUsername(name) // Guardar el nombre en el ViewModel
                             onJoinRoomClick(name, code) // Llamar a la función con el nombre ingresado
                         }
                     )
                 }
+
                 /* Botón de Bluetooth
                 Box {
                     Image(

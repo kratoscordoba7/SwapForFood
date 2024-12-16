@@ -42,6 +42,17 @@ class LobbyViewModel : ViewModel() {
     private val _roomStatus = MutableStateFlow("ACTIVE") // Valores: "ACTIVE", "CLOSED"
     val roomStatus: StateFlow<String> = _roomStatus
 
+    // Nombre del usuario de la app, cuando entre a una sala
+    private var currentUsername: String? = null
+
+    fun setCurrentUsername(username: String) {
+        currentUsername = username
+    }
+
+    fun getCurrentUsername(): String? {
+        return currentUsername
+    }
+
     init {
         initialize()
     }
@@ -94,6 +105,11 @@ class LobbyViewModel : ViewModel() {
                     notifyingSomeoneLeft(messageContent)
                 }
 
+                messageContent.startsWith("USER_REMOVED.") -> {
+                    handleUserRemoved(messageContent)
+                }
+
+
                 // El lider dejó la sala
                 messageContent.contains("ROOM_CLOSED") ||
                         messageContent.contains("REMOVED") -> {
@@ -119,9 +135,32 @@ class LobbyViewModel : ViewModel() {
         }
     }
 
+
+    private fun handleUserRemoved(messageContent: String) {
+        val userRemoved = messageContent.substring("USER_REMOVED.".length) // Extraer el usuario expulsado
+
+        if (userRemoved == currentUsername) { // Suponiendo que el cliente almacena el nombre del usuario actual
+            // Notificar que el usuario fue expulsado
+            viewModelScope.launch {
+                _roomStatus.value = "CLOSED" // Actualizar estado para que lo observe la interfaz
+            }
+            Log.d("LobbyViewModel", "Has sido expulsado de la sala.")
+        } else {
+            // Si otro usuario fue eliminado, actualizar la lista de usuarios
+            viewModelScope.launch {
+                val currentList = _usersInLobby.value.toMutableList()
+                currentList.remove(userRemoved)
+                _usersInLobby.value = currentList
+            }
+            Log.d("LobbyViewModel", "Usuario eliminado: $userRemoved")
+        }
+    }
+
+
     private fun creatingTheLobbyAsLeader(messageContent: String) {
         // Extraer el código de la sala del campo "message"
-        val roomCode = messageContent.substring(4) // Asumiendo que el código comienza después del prefijo "0000"
+        Log.d("Vamoh por aqui", "El mensaje es: $messageContent")
+        val roomCode = messageContent.substring(4, 9) // Asumiendo que el código comienza después del prefijo "0000", descartamos los 4 primeros y pillamos los 5 siguientes.
         viewModelScope.launch {
             _roomCode.value = roomCode // Actualizar el flujo con el código
         }
@@ -206,7 +245,7 @@ class LobbyViewModel : ViewModel() {
             val ip = ensureConnectionAndGetIP(context)
 
             // Enviar mensaje para unirse a la sala
-            val message = Message(ip, "1-$code$username", System.currentTimeMillis())
+            val message = Message(ip, "1$code$username", System.currentTimeMillis())
             webSocketClient.sendMessage(message)
 
             // Esperar hasta que se reciba la lista de usuarios
