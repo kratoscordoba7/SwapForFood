@@ -19,9 +19,13 @@ import kotlinx.coroutines.launch
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.swapfood.dataStructures.Message
+import com.example.swapfood.utils.LoadingOverlay
 import com.example.swapfood.utils.getDeviceIpAddress
 
 class MainActivity : ComponentActivity() {
@@ -80,11 +84,27 @@ class MainActivity : ComponentActivity() {
                                     if (location != null) {
                                         lifecycleScope.launch {
                                             try {
+                                                // Estado mutable para controlar el loading
+                                                val isLoading: MutableState<Boolean> = mutableStateOf(true)
+
+                                                setContent {
+                                                    SwapFoodTheme {
+                                                        Box {
+                                                            // Mostrar la pantalla de carga si está en progreso
+                                                            if (isLoading.value) {
+                                                                LoadingOverlay("Cargando información del servidor...")
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                // Enviar la ubicación y esperar respuesta del servidor
                                                 lobbyViewModel.startGameWithLocation(this@MainActivity, location.first, location.second)
 
                                                 // Observar el estado de la sala para iniciar la pantalla
                                                 lobbyViewModel.roomStatus.collect { status ->
                                                     if (status == "NEW_RESTAURANT") {
+                                                        isLoading.value = false
                                                         showGameScreen()
                                                     }
                                                 }
