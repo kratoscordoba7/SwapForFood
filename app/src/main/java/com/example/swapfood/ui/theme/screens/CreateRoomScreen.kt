@@ -31,6 +31,8 @@ fun CreateRoomScreen(
     showMore: Boolean,
     roomCode: String,
     participants: List<String>,
+    primary: Boolean,
+    myName: String,
     onBackClick: () -> Unit,
     onStartClick: () -> Unit,
     lobbyViewModel: LobbyViewModel,
@@ -98,14 +100,14 @@ fun CreateRoomScreen(
                 // Se podría añadir que si se clicka en el código se pegue en el portapapeles
                 Text(
                     text = "Código: ",
-                    color = Color.White,
+                    color = Color.Black,
                     fontSize = 24.sp,
                     modifier = Modifier.padding(end = 8.dp),
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = roomCode,
-                    color = Color(0xFFFA4032),
+                    color =  Color.White,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -116,7 +118,7 @@ fun CreateRoomScreen(
             // Participants List Title
             Text(
                 text = text,
-                color = Color.Black,
+                color = Color(0xFF1E3E62),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
             )
@@ -127,6 +129,8 @@ fun CreateRoomScreen(
             ParticipantsList(
                 participants = participantsState,
                 showMore = showMore,
+                primary = primary,
+                myName = myName,
                 onRemoveParticipantClick = {
                     participant ->
                     println("Participante seleccionado: $participant")

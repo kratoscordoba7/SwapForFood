@@ -3,13 +3,9 @@ package com.example.swapfood.ui.theme.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,23 +14,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Función para calcular un color más oscuro dinámicamente
-fun Color.darker(factor: Float): Color {
-    return Color(
-        red = this.red * (1 - factor),
-        green = this.green * (1 - factor),
-        blue = this.blue * (1 - factor),
-        alpha = this.alpha // Conserva el nivel de transparencia original
-    )
-}
-
-// Definimos los colores
-val BackgroundColor = Color(0xBBFDA403)
-
 @Composable
 fun ParticipantsList(
     participants: List<String>,
     showMore: Boolean,
+    primary: Boolean,
+    myName: String,
     onRemoveParticipantClick: (String) -> Unit
 ) {
     LazyColumn(
@@ -42,7 +27,26 @@ fun ParticipantsList(
             .fillMaxWidth()
             .padding(8.dp) // Padding interno
     ) {
-        items(participants) { participant ->
+        itemsIndexed(participants) { index, participant ->
+            val (displayName, leaderLabel, myColor) = when {
+                // Si el líder no soy yo
+                index == 0 && participant != myName -> {
+                    Triple(participant, "Líder", Color(0xBBFDA403))
+                }
+                // Si el líder soy yo
+                index == 0 && participant == myName -> {
+                    Triple(participant, "Líder - Tú", Color(0x99FDA403))
+                }
+                // Si no es el líder, pero soy yo
+                index != 0 && participant == myName -> {
+                    Triple("$participant (Tú)", "", Color(0x99FDA403))
+                }
+                // Caso por defecto: otros participantes
+                else -> {
+                    Triple(participant, "", Color(0xBBFDA403))
+                }
+            }
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -50,23 +54,42 @@ fun ParticipantsList(
                 shape = RoundedCornerShape(12.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(BackgroundColor) // Fondo más oscuro para cada usuario
+                        .background(myColor) // Fondo más oscuro para cada usuario
                         .padding(horizontal = 16.dp, vertical = 12.dp), // Padding interno en cada tarjeta
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = if (!showMore) Arrangement.Center else Arrangement.SpaceBetween
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Texto del participante
+                    // Texto del participante a la izquierda
                     Text(
-                        text = participant,
+                        text = displayName,
                         color = Color.Black,
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.weight(1f)
                     )
 
-                    if (showMore) {
+                    // Tarjeta con Rol a la derecha
+                    if (leaderLabel.isNotEmpty()) {
+                        Surface(
+                            color = Color(0xFF3E3E3E), // Fondo oscuro para el rol
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Text(
+                                text = leaderLabel,
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    // Botón "Expulsar"
+                    if (showMore && (!primary || index != 0)) {
                         Button(
                             onClick = { onRemoveParticipantClick(participant) },
                             modifier = Modifier.height(36.dp),

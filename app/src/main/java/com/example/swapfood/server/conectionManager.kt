@@ -45,6 +45,7 @@ class LobbyViewModel : ViewModel() {
     // Nombre del usuario de la app, cuando entre a una sala
     private var currentUsername: String? = null
 
+    private var you: String = ""
     fun setCurrentUsername(username: String) {
         currentUsername = username
     }
@@ -157,7 +158,13 @@ class LobbyViewModel : ViewModel() {
         // Extraer el código de la sala del campo "message"
         Log.d("Vamoh por aqui", "El mensaje es: $messageContent")
         val roomCode = messageContent.substring(4, 9) // Asumiendo que el código comienza después del prefijo "0000", descartamos los 4 primeros y pillamos los 5 siguientes.
+        you =  messageContent.substring(9)
         viewModelScope.launch {
+            val currentList = _usersInLobby.value.toMutableList()
+            if (!currentList.contains(you)) { // Evitar duplicados
+                currentList.add(you)
+                _usersInLobby.value = currentList
+            }
             _roomCode.value = roomCode // Actualizar el flujo con el código
         }
     }
@@ -192,6 +199,7 @@ class LobbyViewModel : ViewModel() {
 
             // Separar los usuarios usando el delimitador '.'
             val usersInLobby = usersConcatenated.split(".").filter { it.isNotEmpty() }
+            you = usersInLobby.last()
 
             // Actualizar el flujo con la lista de usuarios
             viewModelScope.launch {
@@ -309,5 +317,9 @@ class LobbyViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             webSocketClient.close()
         }
+    }
+
+    fun getMyUsername(): String{
+        return you
     }
 }

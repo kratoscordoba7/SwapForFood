@@ -5,8 +5,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.example.swapfood.server.LobbyViewModel
 import com.example.swapfood.ui.screens.CreateRoomScreen
@@ -18,7 +16,6 @@ import kotlinx.coroutines.launch
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
@@ -56,6 +53,7 @@ class MainActivity : ComponentActivity() {
                 try {
                     // Llamar a createLobby de forma suspendida y esperar el código
                     val roomCode = lobbyViewModel.createLobby(this@MainActivity, username)
+                    val myName = lobbyViewModel.getMyUsername()
 
                     /*Si queremos obtener la ubicación al crear la sala
                     val location = getCurrentGPSLocation(this@MainActivity)
@@ -72,6 +70,8 @@ class MainActivity : ComponentActivity() {
                                 showMore,
                                 roomCode,
                                 mutableListOf(""),
+                                true,
+                                myName,
                                 onBackClick = { showMainScreen() },
                                 onStartClick = {
                                     //Aquí podemos mandar la ubicación al servidor
@@ -96,6 +96,7 @@ class MainActivity : ComponentActivity() {
             lifecycleScope.launch{
                 try {
                     val lista = lobbyViewModel.joinLobby(this@MainActivity, username, code)
+                    val myName = lobbyViewModel.getMyUsername()
                     println("Desde MainActivity, la lista de usuarios es: $lista")
                     setContent {
                         SwapFoodTheme {
@@ -103,6 +104,8 @@ class MainActivity : ComponentActivity() {
                                 showMore,
                                 code,
                                 lista,
+                                false,
+                                myName,
                                 onBackClick = { showMainScreen() },
                                 onStartClick = { showGameScreen() },
                                 lobbyViewModel,
