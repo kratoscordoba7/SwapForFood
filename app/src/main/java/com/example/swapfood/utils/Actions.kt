@@ -26,7 +26,7 @@ fun getCurrentGPSLocation(context: Context): Pair<Double, Double>? {
     return location?.let {
         val latitude = it.latitude
         val longitude = it.longitude
-        Log.d("GPS", "Ubicación obtenida: Latitud = $latitude, Longitud = $longitude")
+        //Log.d("GPS", "Ubicación obtenida: Latitud = $latitude, Longitud = $longitude")
         Pair(latitude, longitude)
     } ?: run {
         Log.e("GPS", "No se pudo obtener la ubicación")

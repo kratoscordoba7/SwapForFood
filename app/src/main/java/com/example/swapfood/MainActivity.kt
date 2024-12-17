@@ -57,12 +57,13 @@ class MainActivity : ComponentActivity() {
                     // Llamar a createLobby de forma suspendida y esperar el código
                     val roomCode = lobbyViewModel.createLobby(this@MainActivity, username)
 
-                    // Obtener ubicación GPS
+                    /*Si queremos obtener la ubicación al crear la sala
                     val location = getCurrentGPSLocation(this@MainActivity)
                     if (location != null) {
                         Log.d("LiderUbicacion", "Latitud: ${location.first}, Longitud: ${location.second}")
                         // Aquí puedes enviar la ubicación al servidor o guardarla localmente
                     }
+                    */
 
                     // Proceder a crear la vista con el código recibido
                     setContent {
@@ -72,7 +73,15 @@ class MainActivity : ComponentActivity() {
                                 roomCode,
                                 mutableListOf(""),
                                 onBackClick = { showMainScreen() },
-                                onStartClick = { showGameScreen() },
+                                onStartClick = {
+                                    //Aquí podemos mandar la ubicación al servidor
+                                    val location = getCurrentGPSLocation(this@MainActivity)
+                                    if (location != null) {
+                                        Log.d("LiderUbicacion", "Latitud: ${location.first}, Longitud: ${location.second}")
+                                        // Aquí puedes enviar la ubicación al servidor o guardarla localmente
+                                    }
+                                    showGameScreen()
+                                               },
                                 lobbyViewModel,
                                 this@MainActivity
                             )
