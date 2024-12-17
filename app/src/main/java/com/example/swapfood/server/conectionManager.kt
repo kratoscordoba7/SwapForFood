@@ -53,10 +53,6 @@ class LobbyViewModel : ViewModel() {
         return currentUsername
     }
 
-    init {
-        initialize()
-    }
-
     private fun initialize() {
         if (isInitialized) return
         isInitialized = true
@@ -260,7 +256,7 @@ class LobbyViewModel : ViewModel() {
         try {
             // Asegurar conexión
             if (_connectionState.value != "Connected") {
-                webSocketClient.connect()
+                initialize()
                 _connectionState.filter { it == "Connected" }.first() // Esperar hasta que se conecte
             }
 
@@ -306,9 +302,6 @@ class LobbyViewModel : ViewModel() {
 
         // Crear una nueva instancia de WebSocketClient
         webSocketClient = WebSocketClient("ws://10.0.2.2:8080/ws")
-
-        // Re-inicializar la conexión
-        initialize()
     }
 
     override fun onCleared() {
