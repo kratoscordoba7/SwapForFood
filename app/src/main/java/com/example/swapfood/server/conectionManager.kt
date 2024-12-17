@@ -105,8 +105,15 @@ class LobbyViewModel : ViewModel() {
                     notifyingSomeoneLeft(messageContent)
                 }
 
+                // El usuario fué eliminado
                 messageContent.startsWith("USER_REMOVED.") -> {
                     handleUserRemoved(messageContent)
+                }
+
+                // Hemos recibido un restaurante (en el juego)
+                messageContent.startsWith("NEW_RESTAURANT.") -> {
+                    val restaurantData = jsonObject.getJSONObject("data")
+                    handleNewRestaurant(restaurantData)
                 }
 
 
@@ -288,6 +295,30 @@ class LobbyViewModel : ViewModel() {
             throw e
         }
     }
+
+    private fun handleNewRestaurant(data: JSONObject) {
+        Log.d("LobbyViewModel", "Nuevo restaurante recibido: ${data.toString()}")
+
+        // Aquí notificamos a la UI que el restaurante ha llegado
+        _roomStatus.value = "NEW_RESTAURANT"
+    }
+
+    suspend fun startGameWithLocation(context: Context, latitude: Double, longitude: Double) {
+        try {
+            val ip = ensureConnectionAndGetIP(context)
+
+            // Crear y enviar el mensaje
+            val content = "4${latitude},${longitude}" // "4lat,lng"
+            val message = Message(sender = ip, content = content, timestamp = System.currentTimeMillis())
+            webSocketClient.sendMessage(message)
+            Log.d("LobbyViewModel", "Mensaje enviado con ubicación: $content")
+
+        } catch (e: Exception) {
+            Log.e("LobbyViewModel", "Error al iniciar el juego: ${e.message}")
+            throw e
+        }
+    }
+
 
     fun resetRoomStatus() {
         _roomStatus.value = "ACTIVE"

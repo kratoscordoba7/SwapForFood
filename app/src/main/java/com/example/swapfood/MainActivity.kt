@@ -21,6 +21,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.swapfood.dataStructures.Message
+import com.example.swapfood.utils.getDeviceIpAddress
 
 class MainActivity : ComponentActivity() {
     private val PERMISSION_REQUEST_LOCATION = 1
@@ -74,14 +76,25 @@ class MainActivity : ComponentActivity() {
                                 mutableListOf(""),
                                 onBackClick = { showMainScreen() },
                                 onStartClick = {
-                                    //Aquí podemos mandar la ubicación al servidor
                                     val location = getCurrentGPSLocation(this@MainActivity)
                                     if (location != null) {
-                                        Log.d("LiderUbicacion", "Latitud: ${location.first}, Longitud: ${location.second}")
-                                        // Aquí puedes enviar la ubicación al servidor o guardarla localmente
+                                        lifecycleScope.launch {
+                                            try {
+                                                lobbyViewModel.startGameWithLocation(this@MainActivity, location.first, location.second)
+
+                                                // Observar el estado de la sala para iniciar la pantalla
+                                                lobbyViewModel.roomStatus.collect { status ->
+                                                    if (status == "NEW_RESTAURANT") {
+                                                        showGameScreen()
+                                                    }
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e("MainActivity", "Error al iniciar la partida: ${e.message}")
+                                            }
+                                        }
                                     }
-                                    showGameScreen()
-                                               },
+                                }
+                                ,
                                 lobbyViewModel,
                                 this@MainActivity
                             )
