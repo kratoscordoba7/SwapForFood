@@ -13,14 +13,38 @@ import com.example.swapfood.ui.screens.CreateRoomScreen
 import com.example.swapfood.ui.screens.MainScreen
 import com.example.swapfood.ui.theme.basics.SwapFoodTheme
 import com.example.swapfood.ui.theme.screens.StartGameScreen
+import com.example.swapfood.utils.getCurrentGPSLocation
 import kotlinx.coroutines.launch
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+
 class MainActivity : ComponentActivity() {
+    private val PERMISSION_REQUEST_LOCATION = 1
     private val lobbyViewModel by viewModels<LobbyViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkLocationPermissions() // Verificar permisos al iniciar
         showMainScreen()
+    }
+
+    private fun checkLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Si no está concedido, solicitar permiso
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSION_REQUEST_LOCATION
+            )
+        }
     }
 
     // Función que reemplaza la vista actual con CreateRoomScreen
@@ -32,6 +56,13 @@ class MainActivity : ComponentActivity() {
                 try {
                     // Llamar a createLobby de forma suspendida y esperar el código
                     val roomCode = lobbyViewModel.createLobby(this@MainActivity, username)
+
+                    // Obtener ubicación GPS
+                    val location = getCurrentGPSLocation(this@MainActivity)
+                    if (location != null) {
+                        Log.d("LiderUbicacion", "Latitud: ${location.first}, Longitud: ${location.second}")
+                        // Aquí puedes enviar la ubicación al servidor o guardarla localmente
+                    }
 
                     // Proceder a crear la vista con el código recibido
                     setContent {
@@ -99,4 +130,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
 }

@@ -1,5 +1,9 @@
 package com.example.swapfood.utils
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Location
+import android.location.LocationManager
 import android.util.Log
 
 fun byBluetooth() {
@@ -8,7 +12,24 @@ fun byBluetooth() {
     Log.d("byBluetooth", "Función byBluetooth llamada")
 }
 
-fun getGPSLocation(code: String) {
-    // Lógica con el servidor obtener tu localización GPS
-}
+@SuppressLint("MissingPermission") // Asegúrate de verificar permisos antes de llamar
+fun getCurrentGPSLocation(context: Context): Pair<Double, Double>? {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    val providers = locationManager.getProviders(true)
 
+    var location: Location? = null
+    for (provider in providers) {
+        location = locationManager.getLastKnownLocation(provider)
+        if (location != null) break
+    }
+
+    return location?.let {
+        val latitude = it.latitude
+        val longitude = it.longitude
+        Log.d("GPS", "Ubicación obtenida: Latitud = $latitude, Longitud = $longitude")
+        Pair(latitude, longitude)
+    } ?: run {
+        Log.e("GPS", "No se pudo obtener la ubicación")
+        null
+    }
+}
