@@ -172,7 +172,7 @@ class MainActivity : ComponentActivity() {
     private fun showGameScreen(restaurants: List<Restaurant>) {
         setContent {
             SwapFoodTheme {
-                StartGameScreen(restaurants)
+                StartGameScreen(restaurants, lobbyViewModel)
             }
         }
     }

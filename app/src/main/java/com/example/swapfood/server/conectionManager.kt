@@ -254,6 +254,16 @@ class LobbyViewModel : ViewModel() {
         Log.d("LobbyViewModel", "Nuevo usuario unido: $newUser")
     }
 
+    fun sendRestaurantVote(message: Message){
+        viewModelScope.launch {
+            try {
+                webSocketClient.sendMessage(message)
+            } catch (e: Exception) {
+                Log.e("LobbyViewModel", "Error al enviar mensaje: ${e.message}")
+            }
+        }
+    }
+
     private fun joiningToTheLobby(messageContent: String) {
         try {
             // Formato: "0001<numUsuarios><usuario1>.<usuario2>..."

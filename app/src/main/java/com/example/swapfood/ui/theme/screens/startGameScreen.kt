@@ -1,5 +1,6 @@
 package com.example.swapfood.ui.theme.screens
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -13,14 +14,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import com.example.swapfood.R
+import com.example.swapfood.dataStructures.Message
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.theme.components.RestaurantCard
 import com.example.swapfood.dataStructures.Restaurant
 
+import com.example.swapfood.server.LobbyViewModel // Importar LobbyViewModel
+
+
 @Composable
-fun StartGameScreen(restaurants: List<Restaurant>) {
+fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewModel) {
     var currentRestaurantIndex by remember { mutableStateOf(0) }
     var score by remember { mutableStateOf(0) }
     val swipedRestaurants = remember { mutableSetOf<Int>() }
@@ -72,7 +78,8 @@ fun StartGameScreen(restaurants: List<Restaurant>) {
                                                         targetValue = 1000f,
                                                         animationSpec = tween(durationMillis = 300)
                                                     )
-                                                    score += 1
+                                                    score += 1 //esto se podrá quitar
+                                                    sendVoteToServer(lobbyViewModel, "0", currentRestaurant.id)
                                                     swipedRestaurants.add(currentRestaurantIndex)
                                                     currentRestaurantIndex++
                                                     dragOffset.snapTo(0f)
@@ -82,6 +89,7 @@ fun StartGameScreen(restaurants: List<Restaurant>) {
                                                         targetValue = -1000f,
                                                         animationSpec = tween(durationMillis = 300)
                                                     )
+                                                    sendVoteToServer(lobbyViewModel, "1", currentRestaurant.id)
                                                     swipedRestaurants.add(currentRestaurantIndex)
                                                     currentRestaurantIndex++
                                                     dragOffset.snapTo(0f)
@@ -108,6 +116,19 @@ fun StartGameScreen(restaurants: List<Restaurant>) {
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+        }
+    }
+}
+
+// Función para enviar voto al servidor
+private fun sendVoteToServer(lobbyViewModel: LobbyViewModel, voteType: String, restaurantId: String) {
+    val voteMessage = "5$voteType$restaurantId"
+    lobbyViewModel.viewModelScope.launch {
+        try {
+            val message = Message(sender = "0", content = voteMessage, timestamp = System.currentTimeMillis())
+            lobbyViewModel.sendRestaurantVote(message)
+        } catch (e: Exception) {
+            Log.e("StartGameScreen", "Error al enviar voto: ${e.message}")
         }
     }
 }
