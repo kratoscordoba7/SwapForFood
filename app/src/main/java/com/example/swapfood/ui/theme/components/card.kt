@@ -36,7 +36,7 @@ fun RestaurantCard(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            // Imagen del restaurante
+            /* Imagen del restaurante
             Image(
                 painter = painterResource(id = restaurant.imageRes),
                 contentDescription = "Imagen de ${restaurant.name}",
@@ -46,6 +46,7 @@ fun RestaurantCard(
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
                 contentScale = ContentScale.Crop
             )
+            */
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -83,7 +84,7 @@ fun RestaurantCard(
 
             // Carta del restaurante
             Text(
-                text = restaurant.carta,
+                text = restaurant.description,
                 color = Color.Gray,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,

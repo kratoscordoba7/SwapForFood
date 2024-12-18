@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import com.example.swapfood.dataStructures.Restaurant
+import org.json.JSONArray
 
 class LobbyViewModel : ViewModel() {
     private var isInitialized = false
@@ -39,13 +41,23 @@ class LobbyViewModel : ViewModel() {
     val recentUserEliminated: StateFlow<String?> = _recentUserEliminated
 
     // Estado de la sala
-    private val _roomStatus = MutableStateFlow("ACTIVE") // Valores: "ACTIVE", "CLOSED"
+    // Valores: "ACTIVE", "CLOSED", "LOADING", "NEW_RESTAURANT", "GAME_RESULTS"
+    private val _roomStatus = MutableStateFlow("ACTIVE")
     val roomStatus: StateFlow<String> = _roomStatus
 
     // Nombre del usuario de la app, cuando entre a una sala
     private var currentUsername: String? = null
 
     private var you: String = ""
+
+    //Lista de restaurantes para mostrar cuando recibimos "NEW_RESTAURANT."
+    private val _restaurants = MutableStateFlow<List<Restaurant>>(emptyList()) // NUEVO
+    val restaurants: StateFlow<List<Restaurant>> = _restaurants               // NUEVO
+
+    // Lista de resultados finales cuando recibimos "GAME_RESULTS."
+    private val _gameResults = MutableStateFlow<List<Restaurant>>(emptyList()) // NUEVO
+    val gameResults: StateFlow<List<Restaurant>> = _gameResults               // NUEVO
+
     fun setCurrentUsername(username: String) {
         currentUsername = username
     }
@@ -102,10 +114,61 @@ class LobbyViewModel : ViewModel() {
                     notifyingSomeoneLeft(messageContent)
                 }
 
+                // El usuario fué eliminado
                 messageContent.startsWith("USER_REMOVED.") -> {
                     handleUserRemoved(messageContent)
                 }
 
+                // Comienza el juego, mostrar carga
+                messageContent.startsWith("GAME_START.") -> {
+                    // Actualizar el estado para que la UI muestre la pantalla de carga
+                    viewModelScope.launch {
+                        _roomStatus.value = "LOADING"
+                    }
+                    Log.d("LobbyViewModel", "Partida iniciada: GAME_START recibido.")
+                    Log.d("Aquiii llegamos", "          ")
+                }
+
+                // Hemos recibido un restaurante (en el juego)
+                messageContent.startsWith("NEW_RESTAURANT.") -> {
+                    Log.d("Aquiii llegamos 222222", "          ")
+                    val restaurantsJsonString = messageContent.removePrefix("NEW_RESTAURANT.")
+                    Log.d("El json es: ", restaurantsJsonString)
+                    val restaurantsArray = JSONArray(restaurantsJsonString)
+                    val restaurantList = mutableListOf<Restaurant>()
+                    for (i in 0 until restaurantsArray.length()) {
+                        val rObj = restaurantsArray.getJSONObject(i)
+                        val id = rObj.getString("id")
+                        val name = rObj.getString("name")
+                        val description = rObj.optString("description", "No description available")
+                        val photo_url = rObj.optString("photo_url", "")
+                        restaurantList.add(Restaurant(id, name, description, photo_url))
+                    }
+                    viewModelScope.launch {
+                        _restaurants.value = restaurantList // NUEVO
+                        _roomStatus.value = "NEW_RESTAURANT" // NUEVO
+                    }
+                    Log.d("LobbyViewModel", "Restaurantes recibidos: $restaurantList")
+                }
+                messageContent.startsWith("GAME_RESULTS.") -> {
+                    // Parsear JSON de resultados
+                    val resultsJsonString = messageContent.removePrefix("GAME_RESULTS.")
+                    val resultsArray = JSONArray(resultsJsonString)
+                    val resultsList = mutableListOf<Restaurant>()
+                    for (i in 0 until resultsArray.length()) {
+                        val rObj = resultsArray.getJSONObject(i)
+                        val id = rObj.getString("id")
+                        val name = rObj.getString("name")
+                        val description = rObj.optString("description", "No description available")
+                        val photo_url = rObj.optString("photo_url", "")
+                        resultsList.add(Restaurant(id, name, description, photo_url))
+                    }
+                    viewModelScope.launch {
+                        _gameResults.value = resultsList       // NUEVO
+                        _roomStatus.value = "GAME_RESULTS"     // NUEVO
+                    }
+                    Log.d("LobbyViewModel", "Resultados del juego recibidos: $resultsList") // NUEVO
+                }
 
                 // El lider dejó la sala
                 messageContent.contains("ROOM_CLOSED") ||
@@ -128,7 +191,7 @@ class LobbyViewModel : ViewModel() {
                 }
             }
         } catch (e: Exception) {
-            Log.e("LobbyViewModel", "Error al parsear el mensaje: ${e.message}")
+            Log.e("LobbyViewModel", "Error al parsear el mensaje: ${e.message}, $message")
         }
     }
 
@@ -292,6 +355,30 @@ class LobbyViewModel : ViewModel() {
             throw e
         }
     }
+
+    private fun handleNewRestaurant(data: JSONObject) {
+        Log.d("LobbyViewModel", "Nuevo restaurante recibido: ${data.toString()}")
+
+        // Aquí notificamos a la UI que el restaurante ha llegado
+        _roomStatus.value = "NEW_RESTAURANT"
+    }
+
+    suspend fun startGameWithLocation(context: Context, latitude: Double, longitude: Double) {
+        try {
+            val ip = ensureConnectionAndGetIP(context)
+
+            // Crear y enviar el mensaje
+            val content = "4${latitude},${longitude}" // "4lat,lng"
+            val message = Message(sender = ip, content = content, timestamp = System.currentTimeMillis())
+            webSocketClient.sendMessage(message)
+            Log.d("LobbyViewModel", "Mensaje enviado con ubicación: $content")
+
+        } catch (e: Exception) {
+            Log.e("LobbyViewModel", "Error al iniciar el juego: ${e.message}")
+            throw e
+        }
+    }
+
 
     fun resetRoomStatus() {
         _roomStatus.value = "ACTIVE"
