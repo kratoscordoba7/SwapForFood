@@ -3,8 +3,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Restaurant(
-    val imageRes: Int,
+    val id: String,
     val name: String,
-    val carta: String
+    val description: String = "No description available",
+    val photo_url: String = ""
 )
-

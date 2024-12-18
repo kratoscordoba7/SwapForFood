@@ -20,12 +20,7 @@ import com.example.swapfood.ui.theme.components.RestaurantCard
 import com.example.swapfood.dataStructures.Restaurant
 
 @Composable
-fun StartGameScreen() {
-    val restaurants = listOf(
-        Restaurant(R.drawable.restaurant_1, "McDonald's", "Hamburguesas"),
-        Restaurant(R.drawable.restaurant_2, "Telepizza", "Pizza"),
-        Restaurant(R.drawable.restaurant_3, "ADK", "Kebab")
-    )
+fun StartGameScreen(restaurants: List<Restaurant>) {
     var currentRestaurantIndex by remember { mutableStateOf(0) }
     var score by remember { mutableStateOf(0) }
     val swipedRestaurants = remember { mutableSetOf<Int>() }
@@ -73,28 +68,25 @@ fun StartGameScreen() {
                                         if (!swipedRestaurants.contains(currentRestaurantIndex)) {
                                             when {
                                                 dragOffset.value > 300 -> {
-                                                    // Continuar animación hacia la derecha
                                                     dragOffset.animateTo(
-                                                        targetValue = 1000f, // Fuera de la pantalla
+                                                        targetValue = 1000f,
                                                         animationSpec = tween(durationMillis = 300)
                                                     )
                                                     score += 1
                                                     swipedRestaurants.add(currentRestaurantIndex)
                                                     currentRestaurantIndex++
-                                                    dragOffset.snapTo(0f) // Reseteamos el offset para la siguiente carta
+                                                    dragOffset.snapTo(0f)
                                                 }
                                                 dragOffset.value < -300 -> {
-                                                    // Continuar animación hacia la izquierda
                                                     dragOffset.animateTo(
-                                                        targetValue = -1000f, // Fuera de la pantalla
+                                                        targetValue = -1000f,
                                                         animationSpec = tween(durationMillis = 300)
                                                     )
                                                     swipedRestaurants.add(currentRestaurantIndex)
                                                     currentRestaurantIndex++
-                                                    dragOffset.snapTo(0f) // Reseteamos el offset para la siguiente carta
+                                                    dragOffset.snapTo(0f)
                                                 }
                                                 else -> {
-                                                    // Volver al centro si no se supera el umbral
                                                     dragOffset.animateTo(
                                                         targetValue = 0f,
                                                         animationSpec = tween(durationMillis = 300)
