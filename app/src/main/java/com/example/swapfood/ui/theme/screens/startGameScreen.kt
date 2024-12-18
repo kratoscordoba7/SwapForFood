@@ -10,12 +10,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
+import com.example.swapfood.R
 import kotlinx.coroutines.launch
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Grade
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.ThumbUp
 
 import com.example.swapfood.dataStructures.Message
 import com.example.swapfood.ui.components.AppTopBar
@@ -112,12 +121,123 @@ fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewMode
                         }
                 )
             } else {
-                Log.d("Recibimos los siguientes game results", gameResults.toString())
-                Text(
-                    text = "Juego terminado! Puntuación: $score",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                // Ordenar los resultados por total de votos de forma descendente y tomar los top 3
+                val top3 = gameResults.sortedByDescending { it.totalVotos }.take(3)
+
+                // Fondo decorativo opcional, por ejemplo, con un degradado o imagen
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0xFF1E1E1E)), // Fondo oscuro elegante
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Título de la pantalla de resultados
+                        Text(
+                            text = "Resultados del Juego",
+                            style = MaterialTheme.typography.headlineMedium.copy(color = Color.White),
+                            modifier = Modifier.padding(bottom = 24.dp)
+                        )
+
+                        // Lista de los top 3 restaurantes
+                        top3.forEachIndexed { index, resultVote ->
+                            // Card para cada restaurante
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                                    .shadow(8.dp, shape = MaterialTheme.shapes.medium),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C)),
+                                shape = MaterialTheme.shapes.medium
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Icono de medalla según la posición usando Material Icons
+                                    val medalIcon = when (index) {
+                                        0 -> Icons.Default.EmojiEvents // Oro
+                                        1 -> Icons.Default.Star // Plata
+                                        2 -> Icons.Default.Grade // Bronce
+                                        else -> Icons.Default.Star
+                                    }
+                                    val medalColor = when (index) {
+                                        0 -> Color(0xFFFFD700) // Oro
+                                        1 -> Color(0xFFC0C0C0) // Plata
+                                        2 -> Color(0xFFCD7F32) // Bronce
+                                        else -> Color.Gray
+                                    }
+
+                                    Icon(
+                                        imageVector = medalIcon,
+                                        contentDescription = "Medalla",
+                                        tint = medalColor,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(16.dp))
+
+                                    // Información del restaurante
+                                    Column(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text(
+                                            text = resultVote.nombreDelRestaurante,
+                                            style = MaterialTheme.typography.titleLarge.copy(color = Color.White)
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Votantes: ${resultVote.votantes.joinToString(", ")}",
+                                            style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFFB0B0B0))
+                                        )
+                                    }
+
+                                    // Total de votos con icono de voto
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.ThumbUp,
+                                            contentDescription = "Votos",
+                                            tint = Color(0xFF4CAF50),
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = resultVote.totalVotos.toString(),
+                                            style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Botón para reiniciar el juego o regresar
+                        Button(
+                            onClick = { /* Acción para reiniciar o regresar */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                            shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier
+                                .fillMaxWidth(0.6f)
+                                .height(50.dp)
+                        ) {
+                            Text(
+                                text = "Reiniciar Juego",
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        }
+                    }
+                }
             }
         }
     }
