@@ -72,6 +72,7 @@ fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewMode
                                 onDragEnd = {
                                     coroutineScope.launch {
                                         if (!swipedRestaurants.contains(currentRestaurantIndex)) {
+                                            val currentRestaurantId = restaurants[currentRestaurantIndex].id // Captura el ID aquí
                                             when {
                                                 dragOffset.value > 300 -> {
                                                     dragOffset.animateTo(
@@ -79,7 +80,7 @@ fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewMode
                                                         animationSpec = tween(durationMillis = 300)
                                                     )
                                                     score += 1 //esto se podrá quitar
-                                                    sendVoteToServer(lobbyViewModel, "0", currentRestaurant.id)
+                                                    sendVoteToServer(lobbyViewModel, "0", currentRestaurantId)
                                                     swipedRestaurants.add(currentRestaurantIndex)
                                                     currentRestaurantIndex++
                                                     dragOffset.snapTo(0f)
@@ -89,7 +90,7 @@ fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewMode
                                                         targetValue = -1000f,
                                                         animationSpec = tween(durationMillis = 300)
                                                     )
-                                                    sendVoteToServer(lobbyViewModel, "1", currentRestaurant.id)
+                                                    sendVoteToServer(lobbyViewModel, "1", currentRestaurantId)
                                                     swipedRestaurants.add(currentRestaurantIndex)
                                                     currentRestaurantIndex++
                                                     dragOffset.snapTo(0f)
