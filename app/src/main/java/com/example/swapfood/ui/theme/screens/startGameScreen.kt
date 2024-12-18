@@ -36,7 +36,7 @@ import com.example.swapfood.server.LobbyViewModel // Importar LobbyViewModel
 
 
 @Composable
-fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewModel, gameResults: List<ResultVote> = emptyList()) {
+fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewModel, gameResults: List<ResultVote> = emptyList(), onRestartClick: () -> Unit) {
     var currentRestaurantIndex by remember { mutableStateOf(0) }
     var score by remember { mutableStateOf(0) }
     val swipedRestaurants = remember { mutableSetOf<Int>() }
@@ -139,7 +139,7 @@ fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewMode
                     ) {
                         // Título de la pantalla de resultados
                         Text(
-                            text = "Resultados del Juego",
+                            text = "Resultados de los Votos",
                             style = MaterialTheme.typography.headlineMedium.copy(color = Color.White),
                             modifier = Modifier.padding(bottom = 24.dp)
                         )
@@ -223,7 +223,7 @@ fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewMode
 
                         // Botón para reiniciar el juego o regresar
                         Button(
-                            onClick = { /* Acción para reiniciar o regresar */ },
+                            onClick = { onRestartClick() },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
                             shape = MaterialTheme.shapes.medium,
                             modifier = Modifier
@@ -231,7 +231,7 @@ fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewMode
                                 .height(50.dp)
                         ) {
                             Text(
-                                text = "Reiniciar Juego",
+                                text = "Pantalla de Inicio",
                                 color = Color.White,
                                 style = MaterialTheme.typography.labelLarge
                             )

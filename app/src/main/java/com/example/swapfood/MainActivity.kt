@@ -151,7 +151,7 @@ class MainActivity : ComponentActivity() {
                                 val ourVoteResults = lobbyViewModel.gameResults.value
                                 setContent {
                                     SwapFoodTheme {
-                                        StartGameScreen(emptyList(), lobbyViewModel, ourVoteResults) // Sin restaurantes, finaliza
+                                        StartGameScreen(emptyList(), lobbyViewModel, ourVoteResults, onRestartClick = { restartApplication() }) // Sin restaurantes, finaliza
                                     }
                                 }
                             }
@@ -180,8 +180,18 @@ class MainActivity : ComponentActivity() {
     private fun showGameScreen(restaurants: List<Restaurant>) {
         setContent {
             SwapFoodTheme {
-                StartGameScreen(restaurants, lobbyViewModel)
+                StartGameScreen(restaurants, lobbyViewModel, onRestartClick = { restartApplication() })
             }
+        }
+    }
+
+    private fun restartApplication() {
+        lifecycleScope.launch {
+            // Llama a la función para cerrar websockets y resetear el estado
+            lobbyViewModel.endConnection()
+
+            // Carga la pantalla inicial
+            showMainScreen()
         }
     }
 }
