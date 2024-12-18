@@ -16,17 +16,18 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import com.example.swapfood.R
+
 import com.example.swapfood.dataStructures.Message
 import com.example.swapfood.ui.components.AppTopBar
 import com.example.swapfood.ui.theme.components.RestaurantCard
 import com.example.swapfood.dataStructures.Restaurant
+import com.example.swapfood.dataStructures.ResultVote
 
 import com.example.swapfood.server.LobbyViewModel // Importar LobbyViewModel
 
 
 @Composable
-fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewModel) {
+fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewModel, gameResults: List<ResultVote> = emptyList()) {
     var currentRestaurantIndex by remember { mutableStateOf(0) }
     var score by remember { mutableStateOf(0) }
     val swipedRestaurants = remember { mutableSetOf<Int>() }
@@ -111,6 +112,7 @@ fun StartGameScreen(restaurants: List<Restaurant>, lobbyViewModel: LobbyViewMode
                         }
                 )
             } else {
+                Log.d("Recibimos los siguientes game results", gameResults.toString())
                 Text(
                     text = "Juego terminado! Puntuación: $score",
                     color = Color.White,

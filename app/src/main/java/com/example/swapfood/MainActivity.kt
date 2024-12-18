@@ -147,6 +147,14 @@ class MainActivity : ComponentActivity() {
                                 val restaurants = lobbyViewModel.restaurants.value
                                 showGameScreen(restaurants)
                             }
+                            "GAME_RESULTS" -> { // Estado para resultados
+                                val ourVoteResults = lobbyViewModel.gameResults.value
+                                setContent {
+                                    SwapFoodTheme {
+                                        StartGameScreen(emptyList(), lobbyViewModel, ourVoteResults) // Sin restaurantes, finaliza
+                                    }
+                                }
+                            }
                         }
                     }
                 } catch (e: Exception) {

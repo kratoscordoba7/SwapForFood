@@ -16,6 +16,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import com.example.swapfood.dataStructures.Restaurant
+import com.example.swapfood.dataStructures.ResultVote
 import org.json.JSONArray
 
 class LobbyViewModel : ViewModel() {
@@ -55,8 +56,8 @@ class LobbyViewModel : ViewModel() {
     val restaurants: StateFlow<List<Restaurant>> = _restaurants               // NUEVO
 
     // Lista de resultados finales cuando recibimos "GAME_RESULTS."
-    private val _gameResults = MutableStateFlow<List<Restaurant>>(emptyList()) // NUEVO
-    val gameResults: StateFlow<List<Restaurant>> = _gameResults               // NUEVO
+    private val _gameResults = MutableStateFlow<List<ResultVote>>(emptyList())
+    val gameResults: StateFlow<List<ResultVote>> = _gameResults
 
     fun setCurrentUsername(username: String) {
         currentUsername = username
@@ -131,9 +132,7 @@ class LobbyViewModel : ViewModel() {
 
                 // Hemos recibido un restaurante (en el juego)
                 messageContent.startsWith("NEW_RESTAURANT.") -> {
-                    Log.d("Aquiii llegamos 222222", "          ")
                     val restaurantsJsonString = messageContent.removePrefix("NEW_RESTAURANT.")
-                    Log.d("El json es: ", restaurantsJsonString)
                     val restaurantsArray = JSONArray(restaurantsJsonString)
                     val restaurantList = mutableListOf<Restaurant>()
                     for (i in 0 until restaurantsArray.length()) {
@@ -151,23 +150,44 @@ class LobbyViewModel : ViewModel() {
                     Log.d("LobbyViewModel", "Restaurantes recibidos: $restaurantList")
                 }
                 messageContent.startsWith("GAME_RESULTS.") -> {
+
                     // Parsear JSON de resultados
-                    val resultsJsonString = messageContent.removePrefix("GAME_RESULTS.")
-                    val resultsArray = JSONArray(resultsJsonString)
-                    val resultsList = mutableListOf<Restaurant>()
-                    for (i in 0 until resultsArray.length()) {
-                        val rObj = resultsArray.getJSONObject(i)
-                        val id = rObj.getString("id")
-                        val name = rObj.getString("name")
-                        val description = rObj.optString("description", "No description available")
-                        val photo_url = rObj.optString("photo_url", "")
-                        resultsList.add(Restaurant(id, name, description, photo_url))
+                    val jsonStringValid = messageContent.removePrefix("GAME_RESULTS.")
+
+                    try {
+                        // Asegurarse de que el JSON utiliza comillas dobles
+                        //val jsonStringValid = resultsJsonString.replace('\'', '\"')
+                        val jsonObject = JSONObject(jsonStringValid)
+                        val resultsList = mutableListOf<ResultVote>()
+
+                        // Iterar sobre las claves del JSON (nombres de restaurantes)
+                        val keys = jsonObject.keys()
+                        while (keys.hasNext()) {
+                            val restaurante = keys.next()
+                            val votantesArray = jsonObject.getJSONArray(restaurante)
+                            val votantesList = mutableListOf<String>()
+                            for (i in 0 until votantesArray.length()) {
+                                votantesList.add(votantesArray.getString(i))
+                            }
+                            val totalVotos = votantesList.size
+                            resultsList.add(ResultVote(
+                                nombreDelRestaurante = restaurante,
+                                votantes = votantesList,
+                                totalVotos = totalVotos
+                            ))
+                        }
+
+                        viewModelScope.launch {
+                            _gameResults.value = resultsList
+                            _roomStatus.value = "GAME_RESULTS"
+                        }
+
+                        Log.d("LobbyViewModel", "Resultados del juego recibidos: $resultsList")
+
+                    } catch (e: Exception) {
+                        Log.e("LobbyViewModel", "Error al parsear GAME_RESULTS: ${e.message}")
                     }
-                    viewModelScope.launch {
-                        _gameResults.value = resultsList       // NUEVO
-                        _roomStatus.value = "GAME_RESULTS"     // NUEVO
-                    }
-                    Log.d("LobbyViewModel", "Resultados del juego recibidos: $resultsList") // NUEVO
+
                 }
 
                 // El lider dejó la sala
