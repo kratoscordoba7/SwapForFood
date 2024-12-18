@@ -1,3 +1,4 @@
+// Archivo: NumericInputField.kt
 package com.example.swapfood.ui.components
 
 import androidx.compose.foundation.background
@@ -20,33 +21,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun NumericInputField(codeLength: Int = 5, onComplete: (String) -> Unit,
-                      modifier: Modifier = Modifier // Nuevo parámetro
+fun NumericInputField(
+    code: String, // Estado del código controlado desde el padre
+    onCodeChange: (String) -> Unit, // Función para actualizar el código
+    codeLength: Int = 5,
+    modifier: Modifier = Modifier
 ) {
-    var code by remember { mutableStateOf("") }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
-           // .padding(5.dp) // Opcional: Añade padding al contenedor
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .wrapContentWidth(Alignment.CenterHorizontally) // Eliminamos 'fillMaxWidth()' para corregir el ancho de los recuadros
+                .wrapContentWidth(Alignment.CenterHorizontally)
         ) {
             for (i in 0 until codeLength) {
-                val isCurrentDigit = i == code.length && code.length < codeLength // Verificamos si es el dígito actual
+                val isCurrentDigit = i == code.length && code.length < codeLength
 
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(60.dp) // Asegura que todos los cuadros tengan el mismo tamaño
+                        .size(60.dp)
                         .then(
                             if (isCurrentDigit)
-                                Modifier.scale(1.1f) // Efecto de escalado para el dígito actual
+                                Modifier.scale(1.1f)
                             else
                                 Modifier
                         )
@@ -55,17 +56,17 @@ fun NumericInputField(codeLength: Int = 5, onComplete: (String) -> Unit,
                     Box(
                         modifier = Modifier
                             .matchParentSize()
-                            .border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(12.dp)) // Borde semitransparente
+                            .border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                             .background(
-                                color = Color.White.copy(alpha = 0.3f), // Fondo semitransparente
+                                color = Color.White.copy(alpha = 0.3f),
                                 shape = RoundedCornerShape(12.dp)
                             )
-                            .blur(8.dp) // Efecto de desenfoque para glassmorfismo
+                            .blur(8.dp)
                     )
                     // Texto por encima del fondo desenfocado
                     Text(
                         text = code.getOrNull(i)?.toString() ?: "",
-                        color = Color.Black, // Letras negras
+                        color = Color.Black,
                         fontSize = 24.sp,
                         textAlign = TextAlign.Center
                     )
@@ -80,10 +81,7 @@ fun NumericInputField(codeLength: Int = 5, onComplete: (String) -> Unit,
             value = code,
             onValueChange = { input ->
                 if (input.length <= codeLength && input.all { it.isDigit() }) {
-                    code = input
-                    if (code.length == codeLength) {
-                        onComplete(code) // Llama a la función cuando el código esté completo
-                    }
+                    onCodeChange(input) // Actualiza el estado del código en el padre
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
