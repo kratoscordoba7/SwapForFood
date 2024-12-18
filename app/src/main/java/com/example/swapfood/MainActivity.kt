@@ -101,6 +101,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+                    startGameAndWaitMessages() //Nos quedamos atentos a los mensajes
                 } catch (e: Exception) {
                     Log.e("MainActivity", "Error al unirse a la sala: ${e.message}")
                     throw e
