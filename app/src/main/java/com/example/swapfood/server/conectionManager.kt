@@ -150,7 +150,7 @@ class LobbyViewModel : ViewModel() {
                         // Extrae el campo "photo_url" como String, proporciona un valor por defecto si no existe
                         val photo_url = rObj.optString("photo_url", "")
                         // Extrae el campo "rating" como String, proporciona "N/A" si no existe
-                        val rating = rObj.optString("rating", "N/A")
+                        val rating = rObj.optString("rating", "0")
                         // Extrae el campo "distance" como String, proporciona un valor vacío si no existe
                         val distance = rObj.optString("distance", "")
                         // Crea un objeto Restaurant con los datos extraídos y lo añade a la lista

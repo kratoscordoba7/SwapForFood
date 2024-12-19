@@ -179,7 +179,15 @@ fun RestaurantCard(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     // Mostrar estrellas basadas en la calificación
-                    StarRating(rating = restaurant.rating.toFloat())
+
+                    val floatNum = restaurant.rating.toFloatOrNull()
+
+                    if (floatNum == null){
+                        StarRating(rating=0f)
+                    }else{
+                        StarRating(rating=floatNum)
+                    }
+
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
