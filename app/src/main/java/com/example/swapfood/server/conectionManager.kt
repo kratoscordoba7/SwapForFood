@@ -21,9 +21,10 @@ import org.json.JSONArray
 
 class LobbyViewModel : ViewModel() {
     private var isInitialized = false
+    private var servidor = "ws://46.101.199.25:8080/ws"
 
     // Convertir a var para permitir la reasignación
-    private var webSocketClient = WebSocketClient("ws://10.0.2.2:8080/ws")
+    private var webSocketClient = WebSocketClient(servidor)
 
     // Estado de conexión
     private val _connectionState = MutableStateFlow("Disconnected")
@@ -444,7 +445,7 @@ class LobbyViewModel : ViewModel() {
         webSocketClient.close()
 
         // Crear una nueva instancia de WebSocketClient
-        webSocketClient = WebSocketClient("ws://10.0.2.2:8080/ws")
+        webSocketClient = WebSocketClient(servidor)
     }
 
     override fun onCleared() {
