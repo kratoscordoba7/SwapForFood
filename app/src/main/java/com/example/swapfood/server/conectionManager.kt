@@ -132,21 +132,39 @@ class LobbyViewModel : ViewModel() {
 
                 // Hemos recibido un restaurante (en el juego)
                 messageContent.startsWith("NEW_RESTAURANT.") -> {
+                    // Elimina el prefijo "NEW_RESTAURANT." para obtener el string JSON puro
                     val restaurantsJsonString = messageContent.removePrefix("NEW_RESTAURANT.")
+                    // Parsea el string JSON en un arreglo JSON
                     val restaurantsArray = JSONArray(restaurantsJsonString)
+                    // Crea una lista mutable para almacenar los objetos Restaurant
                     val restaurantList = mutableListOf<Restaurant>()
+                    // Itera sobre cada elemento del arreglo JSON
                     for (i in 0 until restaurantsArray.length()) {
+                        // Obtiene el objeto JSON en la posición actual
                         val rObj = restaurantsArray.getJSONObject(i)
+                        // Extrae el campo "id" como String
                         val id = rObj.getString("id")
+                        // Extrae el campo "name" como String
                         val name = rObj.getString("name")
-                        val description = rObj.optString("description", "No description available")
+                        // Extrae el campo "photo_url" como String, proporciona un valor por defecto si no existe
                         val photo_url = rObj.optString("photo_url", "")
-                        restaurantList.add(Restaurant(id, name, description, photo_url))
+                        // Extrae el campo "rating" como String, proporciona "N/A" si no existe
+                        val rating = rObj.optString("rating", "N/A")
+                        // Extrae el campo "distance" como String, proporciona un valor vacío si no existe
+                        val distance = rObj.optString("distance", "")
+                        // Crea un objeto Restaurant con los datos extraídos y lo añade a la lista
+                        restaurantList.add(Restaurant(id, name, photo_url, rating, distance))
                     }
+
+                    // Lanza una corutina en el scope del ViewModel para actualizar el estado
                     viewModelScope.launch {
-                        _restaurants.value = restaurantList // NUEVO
-                        _roomStatus.value = "NEW_RESTAURANT" // NUEVO
+                        // Actualiza el estado de los restaurantes con la nueva lista
+                        _restaurants.value = restaurantList
+                        // Actualiza el estado de la sala a "NEW_RESTAURANT"
+                        _roomStatus.value = "NEW_RESTAURANT"
                     }
+
+                    // Registra en el log la lista de restaurantes recibidos
                     Log.d("LobbyViewModel", "Restaurantes recibidos: $restaurantList")
                 }
                 messageContent.startsWith("GAME_RESULTS.") -> {

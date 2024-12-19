@@ -1,10 +1,12 @@
 package com.example.swapfood.dataStructures
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class Restaurant(
     val id: String,
     val name: String,
-    val description: String = "No description available",
-    val photo_url: String = ""
+    val photo_url: String = "",
+    val rating: String = "N/A",        // Calificación del restaurante (ej. "4.5")
+    val distance: String = ""           // Distancia al restaurante en km (ej. "0.07")
 )

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,13 +22,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.swapfood.R
 import com.example.swapfood.dataStructures.Restaurant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+
+import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Grade
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.StarBorder
 
 @Composable
 fun RestaurantCard(
@@ -136,7 +145,7 @@ fun RestaurantCard(
                     )
             )
 
-            // Contenido de texto sobre la imagen
+            // Contenido de texto y elementos adicionales sobre la imagen
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -153,16 +162,75 @@ fun RestaurantCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                // Descripción del restaurante
-                Text(
-                    text = restaurant.description,
-                    color = Color.White.copy(alpha = 0.9f),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                // Fila para la calificación y las estrellas
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Calificación: ${restaurant.rating} / 5",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // Mostrar estrellas basadas en la calificación
+                    StarRating(rating = restaurant.rating.toFloat())
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Distancia
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Distancia",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Distancia: ${restaurant.distance} km",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Función para mostrar estrellas basadas en la calificación.
+ * @param rating La calificación del restaurante.
+ */
+@Composable
+fun StarRating(rating: Float, maxRating: Int = 5) {
+    Row {
+        val filledStars = rating.toInt()
+        val hasHalfStar = (rating - filledStars) >= 0.5f
+        for (i in 1..maxRating) {
+            if (i <= filledStars) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = "Star",
+                    tint = Color.Yellow,
+                    modifier = Modifier.size(16.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Outlined.StarBorder,
+                    contentDescription = "Star Border",
+                    tint = Color.Yellow,
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }
