@@ -70,7 +70,7 @@ fun MainScreen(
                             .fillMaxWidth()
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF898121),
+                            containerColor = Color(0xFFF56060),
                             contentColor = Color.White
                         )
                     ) {

@@ -139,10 +139,17 @@ fun StartGameScreen(
             } else {
                 // Mostrar resultados si no hay restaurantes
                 val top3 = gameResults.sortedByDescending { it.totalVotos }.take(3)
+                val backgroundBrush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFCE9815),
+                        Color(0xFFC4A443),
+                        Color(0xFF323232)
+                    )
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0xFF1E1E1E)),
+                        .background(brush = backgroundBrush),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
@@ -232,7 +239,7 @@ fun StartGameScreen(
 
                         Button(
                             onClick = { onRestartClick() },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF212121)),
                             shape = MaterialTheme.shapes.medium,
                             modifier = Modifier
                                 .fillMaxWidth(0.6f)
@@ -256,8 +263,8 @@ fun WaitingScreen(totalWaitTime: Int) {
     // Fondo con degradado bonito
     val backgroundBrush = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF0D0D0D),
-            Color(0xFF1E1E1E),
+            Color(0xFFCE9815),
+            Color(0xFFC4A443),
             Color(0xFF323232)
         )
     )
