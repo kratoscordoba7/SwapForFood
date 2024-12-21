@@ -19,21 +19,33 @@ Se ha realizado una aplicación que se basa en la decisión, por un grupo de ami
 ## 🚀 Cómo ejecutar el proyecto
 
 Sigue estos pasos para configurar y ejecutar la aplicación en tu entorno local:
-
+# Servidor
+1. Clona este repositorio:
+   ```bash
+   git clone https://github.com/DerKom/SwapForFood-server
+   ```
+2. Asegura tener todas las librerías (fastapi, uvicorn, request)
+3. En la terminal de su IDE, abrir el proyecto clonado y ejecutar con el comando
+   ```bash
+   python main.py
+   ```
+# Cliente
 1. Clona este repositorio:
    ```bash
    git clone https://github.com/kratoscordoba7/SwapForFood.git
    ```
 2. Abre el proyecto en Android Studio.
 3. Asegúrate de que tienes un emulador configurado o un dispositivo físico conectado.
-4. Ejecuta el proyecto presionando el botón **Run**.
+4. En el fichero connectionManager la ip debe ser tu servidor local 10.0.2.2:8080
+5. Ejecuta el proyecto presionando el botón **Run**.
+
 ---
 
 ### Objetivos 📖
 La apliación está diseñada bajo el siguiente concepto:
 Imagínese que ha quedado con un grupo de amigos para ver un película o cualquier evento social. Durante el desarrollo de dicho evento en el espectro común surge la idea de comer algo pero no se consigue consensuar algo fácilmente, en este contexto entra nuestra apliación, SwapForFood. Mediante la aplicación se podrá elegir mayoritariamente qué restaurante es el más aceptado en la zona y al cuál se irá. La aplicación opta por un diseño ágil, rápido y divertido para evitar la larga discusión que puede tomar llegar a un punto común entre un grupo de personas.
 
-### Diseño 🎨
+### Distribución 🎨
 Este apartado se puede definir en dos subapartados. Por un lado se tiene la distribución de los paquetes y por otro la experiencia de usuario (UX):
 - Paquetes:
   - Server:
@@ -53,7 +65,38 @@ Este apartado se puede definir en dos subapartados. Por un lado se tiene la dist
 - UX:
    - La aplicación opta por la agilidad. Por tanto, no posee login, para que la experiencia, entre usuarios que desconocen la app y aquellos que ya la tenían descargada, sea fluida.
    - Además, la privacidad de los usuarios es primordial. En ningún momento se almacena ningún dato, ni la ubicación en el momento específico ni los gustos de los restaurantes de los mismos.
-    
+
+### Diseño 🎨
+<div align="center">
+   <img src="./1_screen.png" height=300>
+</div>
+
+En esta pantalla, el usuario puede unirse a una sala existente o crear una nueva. Cabe destacar que la opción de unirse no aparece si no se ingresan exactamente 5 dígitos en el campo de texto.
+
+- Durante el proceso de unión, se envía al servidor el nombre de usuario (username) y el código de la sala a la que el usuario desea unirse. Si la sala existe, el servidor devuelve el conjunto de usuarios que están actualmente en esa sala.
+- Durante el proceso de creación de la sala el usuario introduce y envía al servidor el nombre de usuario que tendrá en esa sala. El servidor devuelve el código que se generó aleatoriamente y asigna a el usuario creador el rol de lider.
+
+
+<div align="center">
+   <img src="./2_screen.png" height=300>
+</div>
+
+En esta pantalla hay dos posbilidades ser lider o no serlo:
+
+- Si no eres lider quedas a la espera teniendo la posibilidad de volver a la sala de inicio.
+- Si eres lider puedes eliminar a cualquier usuario de la sala, el usuario eliminado será notificado mediante un diálogo. Además, puede iniciar el juego, en este momento se le manda al servidor la ubicación del lider y se devuelve a todos los participantes de la sala el conjunto de restaurantes cercanos.
+  
+<div align="center" height=300>
+   <img src="./3_screen.png" height=300>
+</div>
+
+En estas imágenes se muestra una preview del juego, una carta informativa del restaurante que si es desplazada a la derecha se toma como voto positivo y si se desplaza a la izquierda se toma como voto negativo. Por otro lado, si un usuario vota todos los restaurantes antes de que todos los usuarios hayan votado se le mostrará una pantalla de espera (pantalla de la derecha).
+
+<div align="center">
+   <img src="./4_screen.png" height=300>
+</div>
+En esta pantalla, se muestran los tres restaurantes más votados y quiénes los votaron. Así mismo, se permite al usuario volver a la pantalla de inicio.
+
 ### Arquitectura 🏢
 La arquitectura usada en la aplicación es MVVM, la única mayormente aceptada por la comunidad de devs de Kotlin, aquí se explica su uso:
 - Los modelos (Restaurant) son usados en las vistas. (M)
