@@ -13,6 +13,9 @@ Se ha realizado una aplicación que se basa en la decisión, por un grupo de ami
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-%2300C4B3?style=for-the-badge&logo=jetpackcompose&logoColor=white)
 ![Ktor](https://img.shields.io/badge/Ktor-%23621FE8?style=for-the-badge&logo=ktor&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-%230095D5?style=for-the-badge&logo=kotlin&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-%23009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Uvicorn](https://img.shields.io/badge/Uvicorn-%230072C6?style=for-the-badge&logo=uvicorn&logoColor=white)
+![Requests](https://img.shields.io/badge/Requests-%23FF4500?style=for-the-badge&logo=python&logoColor=white)
 
 ---
 
@@ -209,6 +212,8 @@ La función initialize es importante y se repetía este código en la app. Por l
 2. [Ktor](https://ktor.io)
 3. [Google APIs](https://cloud.google.com/apis)
 4. [Kotlin](https://kotlinlang.org)
+5. [FastAPI](https://fastapi.tiangolo.com)
+6. [Uvicorn](https://www.uvicorn.org)
 
 ---
 
